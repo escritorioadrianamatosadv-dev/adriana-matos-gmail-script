@@ -22,6 +22,32 @@
 
 (function () {
   'use strict';
+  // ── AUTO-UPDATE ──────────────────────────────────────────────
+const SCRIPT_RAW_URL = 'https://raw.githubusercontent.com/SEU_USER/adriana-matos-gmail-script/main/script.user.js';
+const VERSAO_ATUAL = GM_info.script.version;
+
+GM_xmlhttpRequest({
+  method: 'GET',
+  url: SCRIPT_RAW_URL + '?_t=' + Date.now(),
+  onload: function(res) {
+    const match = res.responseText.match(/@version\s+([\d.]+)/);
+    if (!match) return;
+    const VERSAO_NOVA = match[1];
+    if (VERSAO_NOVA === VERSAO_ATUAL) return;
+
+    const banner = document.createElement('div');
+    banner.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#1c1c1e;color:#fff;padding:14px 18px;border-radius:12px;z-index:99999;font-size:13px;font-family:-apple-system,sans-serif;box-shadow:0 8px 30px rgba(0,0,0,0.4);border:1px solid rgba(52,199,89,0.3);display:flex;align-items:center;gap:12px;';
+    banner.innerHTML = `
+      <span style="color:#34c759;font-size:18px;">↑</span>
+      <span>Nova versão disponível! <b>${VERSAO_ATUAL} → ${VERSAO_NOVA}</b></span>
+      <a href="${SCRIPT_RAW_URL}" target="_blank" style="background:#34c759;color:#fff;padding:5px 12px;border-radius:8px;text-decoration:none;font-weight:700;font-size:12px;">Atualizar</a>
+      <span style="cursor:pointer;color:#666;font-size:16px;" onclick="this.parentElement.remove()">✕</span>
+    `;
+    document.body.appendChild(banner);
+    setTimeout(() => { if (banner.parentElement) banner.remove(); }, 15000);
+  }
+});
+// ─────────────────────────────────────────────────────────────
 
   const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwp3qu9wUSx-0Dqa4YhZEdEPBi4AIcbuwn1X7UMNkrvPNz7rokaa1YIA9ZnvIV5SEjA/exec';
     const SYNC_INTERVAL_MS = 15000;
