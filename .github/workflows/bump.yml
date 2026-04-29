@@ -1,0 +1,29 @@
+name: Auto Bump Version
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'script.user.js'
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Bump @version
+        run: |
+          FILE="script.user.js"
+          OLD=$(grep -oP '(?<=@version\s)[\d.]+' "$FILE")
+          NEW=$(echo $OLD | awk -F. '{$NF=$NF+1; print}' OFS='.')
+          sed -i "s/@version $OLD/@version $NEW/" "$FILE"
+          echo "Versão: $OLD → $NEW"
+
+      - name: Commit e push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add script.user.js
+          git commit -m "chore: bump version [skip ci]"
+          git push
